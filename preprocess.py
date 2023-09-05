@@ -14,6 +14,7 @@ class DataPreprocessor:
         self.encode_categorical_features()
         self.standardize_data()
         self.split_data(target_column, test_size)
+        self.processed_data = self.data.copy()
 
     def handle_missing_values(self, strategy='median'):
         # Sélectionnez uniquement les colonnes numériques
