@@ -16,7 +16,7 @@ STRUCTURE = {
             'hyperparameters': {
                 'alpha': [0.1, 1.0, 10.0],
                 'fit_intercept': [True, False],
-                'normalize': [True, False],
+                'copy_X': [True, False],
                 'solver': ['auto', 'svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga'],
             }
         },
@@ -54,7 +54,7 @@ def get_algo_reg():
     list_algo_regression = []
     for model_name, model_info in STRUCTURE['regression'].items():
         list_algo_regression.append(model_name)
-        print("voici la liste reg", list_algo_regression)
+        print("Liste régression: ", list_algo_regression)
     return list_algo_regression
 
 
@@ -62,7 +62,7 @@ def get_algo_class():
     list_algo_classification = []
     for model_name, model_info in STRUCTURE['classification'].items():
         list_algo_classification.append(model_name)
-        print("voici la liste class", list_algo_classification)
+        print("Liste classification: ", list_algo_classification)
     return list_algo_classification
 
 
