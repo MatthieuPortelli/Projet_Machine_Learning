@@ -1,5 +1,4 @@
 from typing import Tuple, Union
-
 import pandas as pd
 import psycopg2
 
@@ -46,10 +45,11 @@ def db_connection():
             return table_list
     except Exception as e:
         # Retourner l'erreur
-        return "Erreur lors de la connexion à la base de données : {}".format(e)
+        print("Erreur lors de la connexion à la base de données : {}".format(e))
+        return None
 
 
-def create_dataframe(table_name: str) -> Union[Tuple[pd.DataFrame, str], pd.DataFrame, None]:
+def create_dataframe(table_name: str) -> Union[Tuple[pd.DataFrame, str], None]:
     """
     explication de la methode
 
@@ -71,16 +71,22 @@ def create_dataframe(table_name: str) -> Union[Tuple[pd.DataFrame, str], pd.Data
             # Récupérer les données dans un DataFrame
             df = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
 
-            if df["target"]:
-                # Inspecter le type de données de la colonne "target"
-                target_type = df["target"].dtype
-                # Fermer le curseur
-                cursor.close()
-                # Fermer la connexion
-                connection.close()
-                # Retourner le dataframe et le type de données de "target"
-                return df, target_type
-            return df
+            # Supprimer la colonne "id" si elle existe
+            if "id" in df.columns:
+                df = df.drop(columns=["id"])
+
+            if "target" not in df.columns:
+                print("Votre dataset doit contenir une colonne 'target'")
+
+            # Inspecter le type de données de la colonne "target"
+            target_type = df["target"].dtype
+            # Fermer le curseur
+            cursor.close()
+            # Fermer la connexion
+            connection.close()
+            # Retourner le dataframe et le type de données de "target"
+            print("C'est bien un :", target_type)
+            return df, target_type
     except Exception as e:
         print("Erreur lors de la récupération des données de la table : {}".format(e))
         return None
