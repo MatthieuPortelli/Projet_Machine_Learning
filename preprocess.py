@@ -49,7 +49,7 @@ class DataPreprocessor:
         scaler = StandardScaler()
         self.data[self.data.columns[:-1]] = scaler.fit_transform(self.data[self.data.columns[:-1]])
 
-    def split_data(self, target_column, test_size=0.2):
+    def split_data(self, target_column, test_size):
         X = self.data.drop(columns=[target_column])
         y = self.data[target_column]
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=test_size, random_state=42)
