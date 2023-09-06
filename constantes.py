@@ -99,7 +99,6 @@ def get_algo_reg():
     list_algo_regression = []
     for model_name, model_info in STRUCTURE['regression'].items():
         list_algo_regression.append(model_name)
-        print("Voici la liste reg", list_algo_regression)
     return list_algo_regression
 
 
@@ -107,7 +106,6 @@ def get_algo_class():
     list_algo_classification = []
     for model_name, model_info in STRUCTURE['classification'].items():
         list_algo_classification.append(model_name)
-        print("Voici la liste class", list_algo_classification)
     return list_algo_classification
 
 
