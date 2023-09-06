@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import db
 import constantes
+from visualisations import *
 from preprocess import DataPreprocessor
 from models import train_model, evaluate_model
 
@@ -34,7 +35,7 @@ def sidebar():
         with st.expander("Description du DataFrame"):
             description = df.describe()
             st.write(description)
-        selected_model, model_family = get_algo(target_type)
+        selected_model, model_family, selected_params = get_algo(target_type)
         # Nettoyez les données en utilisant DataPreprocessor
         data_preprocessor = DataPreprocessor(df, target_column='target')
         processed_dataframe = data_preprocessor.processed_data
@@ -51,12 +52,12 @@ def sidebar():
             st.pyplot()
         with st.expander("GridSearchCV"):
             # Récupération des résultats de GridSearchCV
-            best_model, best_params, best_score = train_model(selected_model, X_train, y_train)
+            best_model, best_params, best_score = train_model(selected_model, X_train, y_train, selected_params)
             st.write(best_model)
             st.write(best_params)
             st.write(best_score)
         with st.expander("Métriques"):
-            metrics = evaluate_model(best_model, X_test, y_test, model_family)
+            metrics, y_pred = evaluate_model(best_model, X_test, y_test, model_family)
             st.write(metrics)
             # for i in metrics.keys():
             #     if i == 'Accuracy':
@@ -67,8 +68,14 @@ def sidebar():
             #         st.write('3')
             #     elif i == 'F1-Score':
             #         st.write('4')
-        with st.expander("Visualisations"):
-            st.write('Des beaux graphiques')
+        # with st.expander("Visualisations"):
+        #     # fig = plot_regression_scatter(y_test, y_pred, selected_model)
+        #     # st.pyplot(fig)
+        #     fig_1, fig_2 = visualize_selected_model(selected_model, y_test, y_pred)
+        #     print(fig_1)
+        #     print(fig_2)
+        #     st.pyplot(fig_1)
+        #     st.pyplot(fig_2)
 
 
 def get_algo(target_type):
@@ -86,8 +93,8 @@ def get_algo(target_type):
         selected_algo = st.sidebar.selectbox("Sélectionnez un algorithme", list_algo_classification)
     if selected_algo and model_family:
         print(f"Vous avez choisi {selected_algo}")
-        get_params(selected_algo)
-        return selected_algo, model_family
+        selected_params = get_params(selected_algo)
+        return selected_algo, model_family, selected_params
 
 
 def get_params(selected_algo):
@@ -98,25 +105,27 @@ def get_params(selected_algo):
         print("Vous avez choisi test_size =", test_size)
     st.sidebar.markdown('---')
     on = st.sidebar.toggle("Modifier les hyperparamètres")
+    selected_params = {}
     if on:
         # Afficher les hyperparamètres selon le modèle choisi
         hyperparameters = constantes.get_hyperparameters(selected_algo)
-        selected_params = {}
         for parametre, values in hyperparameters.items():
             print("test", parametre, values)
             if all(isinstance(value, (int, float)) for value in values):
-                print("isinstance: int, float")
+                # print("isinstance: int, float")
                 selected_value = st.sidebar.select_slider(parametre, options=values['values'], key=parametre, help=values['description'])
             elif all(isinstance(value, bool) for value in values):
-                print("isinstance: bool")
+                # print("isinstance: bool")
                 selected_value = st.sidebar.selectbox(parametre, options=values['values'], key=parametre, help=values['description'])
             else:
-                print("isinstance: else (str)")
+                # print("isinstance: else (str)")
                 selected_value = st.sidebar.selectbox(parametre, options=values['values'], key=parametre, help=values['description'])
             # Ajouter le paramètre au dictionnaire
-            selected_params[parametre] = selected_value
-            print("Paramètres sélectionnés :", selected_params[parametre])
+            selected_params[parametre] = [selected_value]
+            # print("Paramètres sélectionnés :", selected_params[parametre])
     st.sidebar.markdown('---')
+    print('main.py / get_params / selected_params: ', selected_params)
+    return selected_params
 
 
 def main():
