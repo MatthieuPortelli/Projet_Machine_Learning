@@ -40,27 +40,6 @@ STRUCTURE = {
         },
     },
     'classification': {
-        'Random_Forest': {
-            'model': RandomForestClassifier(),
-            'hyperparameters': {
-                'n_estimators': {
-                    'description': "Nombre d'arbres.",
-                    'values': [10, 100, 1000],
-                },
-                'criterion': {
-                    'description': "Fonction de critère pour la division des noeuds de l'arbre.",
-                    'values': ['gini', 'entropy', 'log_loss'],
-                },
-                'max_depth': {
-                    'description': 'Profondeur maximale de chaque arbre.',
-                    'values': [100, 200, 300],
-                },
-                'min_samples_split': {
-                    'description': "Nombre minimum d'échantillons requis pour diviser un noeud interne.",
-                    'values': [2, 5, 10],
-                },
-            }
-        },
         'KNN_Classification': {
             'model': KNeighborsClassifier(),
             'hyperparameters': {
@@ -88,6 +67,27 @@ STRUCTURE = {
                 'C': {
                     'description': "Paramètre d'inversion de la force de régularisation.",
                     'values': [0.1, 1.0, 10.0],
+                },
+            }
+        },
+        'Random_Forest': {
+            'model': RandomForestClassifier(),
+            'hyperparameters': {
+                'n_estimators': {
+                    'description': "Nombre d'arbres.",
+                    'values': [10, 100, 1000],
+                },
+                'criterion': {
+                    'description': "Fonction de critère pour la division des noeuds de l'arbre.",
+                    'values': ['gini', 'entropy', 'log_loss'],
+                },
+                'max_depth': {
+                    'description': 'Profondeur maximale de chaque arbre.',
+                    'values': [100, 200, 300],
+                },
+                'min_samples_split': {
+                    'description': "Nombre minimum d'échantillons requis pour diviser un noeud interne.",
+                    'values': [2, 5, 10],
                 },
             }
         },
