@@ -67,14 +67,10 @@ def sidebar():
             for metric_name, metric_value in metrics.items():
                 st.markdown(f"{metric_name} : <span style='color: #FFB923'>{metric_value}</span>",
                             unsafe_allow_html=True)
-        # with st.expander("**Visualisations**"):
-            # fig = plot_regression_scatter(y_test, y_pred, selected_model)
-            # st.pyplot(fig)
-            # fig_1, fig_2 = visualize_selected_model(selected_model, y_test, y_pred)
-            # print(fig_1)
-            # print(fig_2)
-            # st.pyplot(fig_1)
-            # st.pyplot(fig_2)
+        with st.expander("**Visualisations**"):
+            fig_1, fig_2 = visualize_selected_model(selected_model, y_test, y_pred)
+            st.pyplot(fig_1)
+            st.pyplot(fig_2)
 
 
 def get_algo(target_type):
@@ -90,12 +86,6 @@ def get_algo(target_type):
         selected_algo = st.sidebar.selectbox("Sélectionnez un algorithme", list_algo_classification, key='3')
     if selected_algo and model_family:
         selected_params, test_size = get_params(selected_algo)
-        # st.sidebar.markdown('---')
-        # on = st.sidebar.toggle("Modifier la taille de test")
-        # if on:
-        #     test_size = st.sidebar.slider(" ", 0.5, 0.95, 0.2, 0.05)
-        #     st.sidebar.markdown('---')
-        #     return selected_algo, model_family, selected_params, test_size
         return selected_algo, model_family, selected_params, test_size
 
 
@@ -138,7 +128,6 @@ def main():
 
 
 if __name__ == '__main__':
-    print('------')
     intro()
     header()
     sidebar()
