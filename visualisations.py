@@ -1,7 +1,5 @@
-import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import label_binarize
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 
 
@@ -36,27 +34,19 @@ def plot_confusion_matrix(selected_model, y_true, y_pred):
 
 
 def plot_roc_curve(selected_model, y_true, y_pred):
-    # Binarize the output
-    y_test_bin_logis = label_binarize(y_true, classes=np.unique(y_true))
-    y_pred_bin_logis = label_binarize(y_pred, classes=np.unique(y_pred))
-    Classes = ['0', '1', '2']
-
-    fig = plt.figure(figsize=(8, 5))
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
-    n_class = 3
-    for i in range(n_class):
-        fpr[i], tpr[i], _ = roc_curve(y_test_bin_logis[:, i], y_pred_bin_logis[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
-        plt.plot(fpr[i], tpr[i], linestyle='--', label='%s vs Rest (AUC=%0.2f)' % (Classes[i], roc_auc[i]))
-
+    # Calculer les taux de faux positifs (FPR) et les taux de vrais positifs (TPR)
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred)
+    # Calcul de l'aire sous la courbe ROC (AUC)
+    roc_auc = auc(fpr, tpr)
+    # Tracer la courbe ROC
+    fig = plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='Courbe ROC (AUC = %0.2f)' % roc_auc)
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlim([0, 1])
-    plt.ylim([0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Multiclass ROC curve {}'.format(selected_model))
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Taux de Faux Positifs (FPR)')
+    plt.ylabel('Taux de Vrais Positifs (TPR)')
+    plt.title('Courbe ROC ({})'.format(selected_model))
     plt.legend(loc='lower right')
     return fig
 
