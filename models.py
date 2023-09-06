@@ -4,8 +4,6 @@ from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, precis
 
 
 def train_model(model, X_train, y_train, hyperparameters=None):
-    print('models.py / train_model / hyperparameters1: ', hyperparameters)
-
     if model in STRUCTURE['regression']:
         model_info = STRUCTURE['regression'][model]
     elif model in STRUCTURE['classification']:
@@ -13,24 +11,18 @@ def train_model(model, X_train, y_train, hyperparameters=None):
     else:
         raise ValueError("Modèle non trouvé dans la structure.")
     model = model_info['model']
-
     # Récupération des hyperparameters
     if not hyperparameters:
-        print('TEST')
         hyperparameters = {param: param_info['values'] for param, param_info in model_info['hyperparameters'].items()}
-    print('models.py / train_model / hyperparameters2: ', hyperparameters)
-
     # Instance GridSearchCV pour effectuer une recherche sur la grille d'hyperparamètres avec validation croisée
     # Possibilité d'ajuster le nombre de plis de validation croisée (cv) selon vos besoins
     grid_search = GridSearchCV(model, hyperparameters, cv=5)
     # Entraîner le modèle avec les meilleurs hyperparamètres
-    print('models.py / train_model / avant .fit')
     grid_search.fit(X_train, y_train)
-    print('models.py / train_model / après .fit')
     # Récupérez le meilleur modèle, les meilleurs paramètres et le meilleur score
     best_model = grid_search.best_estimator_
     best_params = grid_search.best_params_
-    best_score = grid_search.best_score_
+    best_score = round(grid_search.best_score_, 3)
     return best_model, best_params, best_score
 
 
