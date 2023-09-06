@@ -5,11 +5,11 @@ import psycopg2
 
 def create_connection():
     db_params = {
-        'host': 'ec2-34-247-94-62.eu-west-1.compute.amazonaws.com',
-        'database': 'd4on6t2qk9dj5a',
-        'user': 'nxebpjsgxecqny',
+        'host': 'ec2-34-247-16-250.eu-west-1.compute.amazonaws.com',
+        'database': 'd1fqoktf0gl90p',
+        'user': 'xpfxvuvcndvbve',
         'port': '5432',
-        'password': '1da2f1f48e4a37bf64e3344fe7670a6547c169472263b62d042a01a8d08d2114'
+        'password': '43b5e0de771549a5cb3117f84603628575b85328a0aecd350b017dcbf4534ddb'
     }
 
     try:
@@ -85,7 +85,6 @@ def create_dataframe(table_name: str) -> Union[Tuple[pd.DataFrame, str], None]:
             # Fermer la connexion
             connection.close()
             # Retourner le dataframe et le type de données de "target"
-            print("C'est bien un :", target_type)
             return df, target_type
     except Exception as e:
         print("Erreur lors de la récupération des données de la table : {}".format(e))
