@@ -15,9 +15,9 @@ def plot_regression_scatter(selected_model, y_true_regression, y_pred_regression
                 "en fonction de la dispersion autour de la ligne ou de la tendance. \n " \
                 "Les variations sont un changement proportionnel.".format(
         selected_model)
-    plt.text(0.5, -0.15, help_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10, color='#34516F')
+    # plt.text(0.5, -0.15, help_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10, color='#34516F')
     plt.legend()
-    return fig
+    return fig, help_text
 
 
 def plot_regression_histogram(selected_model, y_true, y_pred):
@@ -32,8 +32,8 @@ def plot_regression_histogram(selected_model, y_true, y_pred):
     help_text = "\n \n Représentation de la distribution des erreurs de prédiction du modèle. \n " \
                 "Une distribution autour de zéro et symétrique indique généralement des prédictions précises."\
         .format(selected_model)
-    plt.text(0.5, -0.15, help_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10, color='#34516F')
-    return fig
+    # plt.text(0.5, -0.15, help_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10, color='#34516F')
+    return fig, help_text
 
 
 def plot_confusion_matrix(selected_model, y_true, y_pred):
@@ -48,8 +48,8 @@ def plot_confusion_matrix(selected_model, y_true, y_pred):
                 "le modèle fait des prédictions précises, \n " \
                 "en identifiant correctement les vrais positifs et négatifs ainsi que les faux positifs et négatifs."\
         .format(selected_model)
-    plt.text(0.5, -0.15, help_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10, color='#34516F')
-    return fig
+    # plt.text(0.5, -0.15, help_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10, color='#34516F')
+    return fig, help_text
 
 
 def plot_roc_curve(selected_model, y_true, y_pred):
@@ -71,23 +71,23 @@ def plot_roc_curve(selected_model, y_true, y_pred):
                 "Une courbe ROC idéale se rapproche du coin supérieur gauche, elle distingue efficacement les classes,\n " \
                 "une courbe se rapprochant de la ligne diagonale aléatoire suggère une performance médiocre." \
         .format(selected_model)
-    plt.text(0.5, -0.15, help_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10,
-             color='#34516F')
+    # plt.text(0.5, -0.15, help_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10,
+    #          color='#34516F')
     plt.legend(loc='lower right')
-    return fig
+    return fig, help_text
 
 
 def visualize_selected_model(selected_algo, y_true_regression, y_pred_regression):
     regression = ["Regression_Lineaire", "Regression_Ridge"]
     classification = ["Random_Forest", "KNN_Classification", "Regression_Logistique"]
     if selected_algo in regression:
-        fig_1 = plot_regression_scatter(selected_algo, y_true_regression, y_pred_regression)
-        fig_2 = plot_regression_histogram(selected_algo, y_true_regression, y_pred_regression)
-        return fig_1, fig_2
+        fig_1, help_text_1 = plot_regression_scatter(selected_algo, y_true_regression, y_pred_regression)
+        fig_2, help_text_2 = plot_regression_histogram(selected_algo, y_true_regression, y_pred_regression)
+        return fig_1, help_text_1, fig_2, help_text_2
     elif selected_algo in classification:
-        fig_3 = plot_confusion_matrix(selected_algo, y_true_regression, y_pred_regression)
-        fig_4 = plot_roc_curve(selected_algo, y_true_regression, y_pred_regression)
-        return fig_3, fig_4
+        fig_3, help_text_1 = plot_confusion_matrix(selected_algo, y_true_regression, y_pred_regression)
+        fig_4, help_text_2 = plot_roc_curve(selected_algo, y_true_regression, y_pred_regression)
+        return fig_3, help_text_1, fig_4, help_text_2
 
 
 def plot_learning_curve(model, X, y):
@@ -99,12 +99,12 @@ def plot_learning_curve(model, X, y):
     test_mean = np.mean(test_scores, axis=1)
     test_std = np.std(test_scores, axis=1)
     plt.figure(figsize=(10, 6))
-    plt.plot(train_sizes, train_mean, color='blue', marker='o', markersize=5, label='Training accuracy')
+    plt.plot(train_sizes, train_mean, color='blue', marker='o', markersize=5, label="Précision d'entraînement")
     plt.fill_between(train_sizes, train_mean + train_std, train_mean - train_std, alpha=0.15, color='blue')
-    plt.plot(train_sizes, test_mean, color='green', linestyle='--', marker='s', markersize=5, label='Validation accuracy')
-    plt.fill_between(train_sizes, test_mean + test_std, test_mean - test_std, alpha=0.15, color='green')
-    plt.xlabel('Number of training samples')
-    plt.ylabel('Accuracy')
+    plt.plot(train_sizes, test_mean, color='#FFB923', linestyle='--', marker='s', markersize=5, label="Précision de validation")
+    plt.fill_between(train_sizes, test_mean + test_std, test_mean - test_std, alpha=0.15, color='#FFB923')
+    plt.xlabel("Nombre d'échantillons d'entraînement")
+    plt.ylabel('Précision')
     plt.legend(loc='lower right')
-    plt.title('Learning Curve')
+    plt.title("Courbe d'apprentissage")
     return plt
