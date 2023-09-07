@@ -8,9 +8,9 @@
 
 - **Sélection des Colonnes** : Choisissez les colonnes spécifiques du jeu de données à utiliser, y compris la colonne cible.
 
-- **Visualisations** : Visualisez la matrice de corrélation, les données de la grille, les métriques de performance, et plus encore.
-
 - **Hyperparamètres Optimaux** : Utilisez GridSearchCV pour trouver les meilleurs hyperparamètres pour votre modèle.
+
+- **Visualisations** : Visualisez la matrice de corrélation, les données de la grille, les métriques de performance, et plus encore.
 
 - **Rapports PDF** : Générez des rapports PDF contenant des informations sur le modèle sélectionné, les hyperparamètres optimaux, les métriques de performance et des visualisations.
 
