@@ -1,6 +1,8 @@
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, roc_curve, auc
+from sklearn.model_selection import learning_curve
 
 
 def plot_regression_scatter(selected_model, y_true_regression, y_pred_regression):
@@ -86,3 +88,23 @@ def visualize_selected_model(selected_algo, y_true_regression, y_pred_regression
         fig_3 = plot_confusion_matrix(selected_algo, y_true_regression, y_pred_regression)
         fig_4 = plot_roc_curve(selected_algo, y_true_regression, y_pred_regression)
         return fig_3, fig_4
+
+
+def plot_learning_curve(model, X, y):
+    train_sizes, train_scores, test_scores = learning_curve(
+        model, X, y, cv=5, scoring='accuracy', train_sizes=np.linspace(0.1, 1.0, 10)
+    )
+    train_mean = np.mean(train_scores, axis=1)
+    train_std = np.std(train_scores, axis=1)
+    test_mean = np.mean(test_scores, axis=1)
+    test_std = np.std(test_scores, axis=1)
+    plt.figure(figsize=(10, 6))
+    plt.plot(train_sizes, train_mean, color='blue', marker='o', markersize=5, label='Training accuracy')
+    plt.fill_between(train_sizes, train_mean + train_std, train_mean - train_std, alpha=0.15, color='blue')
+    plt.plot(train_sizes, test_mean, color='green', linestyle='--', marker='s', markersize=5, label='Validation accuracy')
+    plt.fill_between(train_sizes, test_mean + test_std, test_mean - test_std, alpha=0.15, color='green')
+    plt.xlabel('Number of training samples')
+    plt.ylabel('Accuracy')
+    plt.legend(loc='lower right')
+    plt.title('Learning Curve')
+    return plt
