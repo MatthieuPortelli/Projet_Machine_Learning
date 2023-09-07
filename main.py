@@ -4,7 +4,7 @@ import seaborn as sns
 import db
 import constantes
 from report import generate_pdf_report
-from visualisations import visualize_selected_model
+from visualisations import visualize_selected_model, plot_learning_curve
 from preprocess import DataPreprocessor
 from models import train_model, evaluate_model
 import base64
@@ -96,6 +96,11 @@ def sidebar():
                 fig_1, fig_2 = visualize_selected_model(selected_model, y_test, y_pred)
                 st.pyplot(fig_1)
                 st.pyplot(fig_2)
+                # Courbe d'apprentissage
+                st.subheader("Courbe d'Apprentissage")
+                learning_curve_plot = plot_learning_curve(best_model, X_train, y_train)
+                st.pyplot(learning_curve_plot)
+                st.caption("La courbe d'apprentissage montre comment la performance d'un modèle change à mesure que vous lui donnez plus de données d'entraînement. Elle indique si le modèle apprend bien ou s'il en sait trop.")
             # Gestion du pdf
             generate_report = st.button("Générer le rapport PDF")
             if generate_report:
