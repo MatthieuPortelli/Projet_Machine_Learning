@@ -93,9 +93,12 @@ def sidebar():
                     else:
                         st.markdown(f"{metric_name} : {metric_value}")
             with st.expander("**Visualisations**"):
-                fig_1, fig_2 = visualize_selected_model(selected_model, y_test, y_pred)
+                fig_1, help_text_1, fig_2, help_text_2 = visualize_selected_model(selected_model, y_test, y_pred)
                 st.pyplot(fig_1)
+                st.caption(help_text_1)
+                st.write('')
                 st.pyplot(fig_2)
+                st.caption(help_text_2)
                 # Courbe d'apprentissage
                 st.subheader("Courbe d'Apprentissage")
                 learning_curve_plot = plot_learning_curve(best_model, X_train, y_train)
