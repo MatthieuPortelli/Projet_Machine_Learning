@@ -1,10 +1,11 @@
 import base64
 import constantes
 import matplotlib.pyplot as plt
+import os
 import pandas as pd
 import seaborn as sns
 import streamlit as st
-from dataframe import load_csv_to_dataframe
+from dataframe import load_csv_to_dataframe, list_csv_files
 from models import train_model, evaluate_model
 from preprocess import DataPreprocessor
 from report import generate_pdf_report
@@ -24,104 +25,107 @@ def header():
 
 
 def sidebar():
-    # Widget pour télécharger le fichier CSV
-    uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type=["csv"])
-    if uploaded_file:
-        # Utilisation de la fonction pour charger le fichier CSV en un DataFrame
-        result = load_csv_to_dataframe(uploaded_file)
-        if isinstance(result, str):
-            # Gestion d'une erreur renvoyée par scrape_url
-            st.sidebar.write(f'<span style="color: red;">{result}</span>', unsafe_allow_html=True)
-        df = result[0]
-        target_type = result[1]
-        # Vérification si un DataFrame a été créé
-        if isinstance(df, pd.DataFrame):
-            expander = st.sidebar.expander("Sélectionnez des colonnes spécifiques")
-            try:
-                columns = expander.multiselect(
-                    "Choissisez les colonnes sur lesquelles appliquer le modèle, n'oubliez pas la colonne target",
-                    df.columns)
-                if columns:
-                    df = df[columns]
-                with st.expander("**DataFrame**"):
-                    # Affichage du DataFrame
-                    st.write(df)
-                with st.expander("**Description du DataFrame**"):
-                    description = df.describe()
-                    st.write(description)
-                selected_model, model_family, selected_params, test_size = get_algo(target_type)
-                if test_size is None:
-                    data_preprocessor = DataPreprocessor(df, target_column='target')
-                else:
-                    data_preprocessor = DataPreprocessor(df, target_column='target', test_size=test_size)
-                processed_dataframe = data_preprocessor.processed_data
-                X_train = data_preprocessor.X_train
-                X_test = data_preprocessor.X_test
-                y_train = data_preprocessor.y_train
-                y_test = data_preprocessor.y_test
-                with st.expander("**Matrice de Corrélation**"):
-                    correlation_matrix = processed_dataframe.corr()
-                    plt.figure(figsize=(10, 8))
-                    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
-                    # Ne pas afficher le message warning
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                    st.pyplot()
-                with st.expander("**GridSearchCV**"):
-                    # Récupération des résultats de GridSearchCV
-                    best_model, best_params, best_score = train_model(selected_model, X_train, y_train, selected_params)
-                    st.write("**Les hyperparamètres optimaux sont :**")
-                    for param_name, param_value in best_params.items():
-                        st.markdown(f"{param_name} : <span style='color: #FFB923'>{param_value}</span>",
-                                    unsafe_allow_html=True)
-                    st.write("**Le score obtenu est :**")
-                    st.write(f'<span style="color: #FFB923;"> {best_score}</span>', unsafe_allow_html=True)
-                with st.expander("**Métriques**"):
-                    metrics, y_pred = evaluate_model(best_model, X_test, y_test, model_family)
-                    for metric_name, metric_value in metrics.items():
-                        st.markdown(f"<span style='color: #FFB923'>{metric_name}</span> : {metric_value}",
-                                    unsafe_allow_html=True)
-                        if metric_name == "Accuracy":
-                            st.markdown(
-                                "_Proportion de prédictions correctes parmi toutes les prédictions effectuées._")
-                        elif metric_name == "Precision":
-                            st.markdown("_Proportion de vrais positifs parmi toutes les prédictions positives._")
-                        elif metric_name == "Recall":
-                            st.markdown("_Proportion de vrais positifs parmi toutes les instances réelles positives._")
-                        elif metric_name == "F1-Score":
-                            st.markdown(
-                                "_Moyenne harmonique de la précision et du rappel, une mesure globale de la performance._")
-                        elif metric_name == "MSE":
-                            st.markdown(
-                                "_Mean Squared Error (Erreur quadratique moyenne), une mesure de la précision des prédictions._")
-                        elif metric_name == "R²":
-                            st.markdown(
-                                "_Coefficient de détermination R², une mesure de l'ajustement du modèle aux données._")
-                        else:
-                            st.markdown(f"{metric_name} : {metric_value}")
-                with st.expander("**Visualisations**"):
-                    fig_1, help_text_1, fig_2, help_text_2 = visualize_selected_model(selected_model, y_test, y_pred)
-                    st.pyplot(fig_1)
-                    st.caption(help_text_1)
-                    st.write('')
-                    st.pyplot(fig_2)
-                    st.caption(help_text_2)
-                    # Courbe d'apprentissage
-                    st.subheader("Courbe d'Apprentissage")
-                    learning_curve_plot = plot_learning_curve(best_model, X_train, y_train)
-                    st.pyplot(learning_curve_plot)
-                    st.caption(
-                        "La courbe d'apprentissage montre comment la performance d'un modèle change à mesure que vous lui donnez plus de données d'entraînement. Elle indique si le modèle apprend bien ou s'il en sait trop.")
-                # Gestion du pdf
-                generate_report = st.button("Générer le rapport PDF")
-                if generate_report:
-                    pdf_data = generate_pdf_report(selected_model, best_params, best_score, metrics, fig_1, fig_2)
-                    # Affichez le lien de téléchargement pour le PDF généré
-                    st.success("Le rapport PDF a été généré avec succès. Cliquez ci-dessous pour le télécharger.")
-                    st.markdown(get_binary_file_downloader_html(pdf_data, "Rapport", "Télécharger le PDF"),
+    # Chemin vers le répertoire contenant les fichiers CSV
+    csv_directory = 'csv'
+    # Affichez la liste des fichiers CSV disponibles dans le répertoire
+    csv_files = list_csv_files(csv_directory)
+    selected_csv = st.sidebar.selectbox("Sélectionnez un fichier CSV existant", csv_files)
+    # Chargez le fichier CSV sélectionné par l'utilisateur
+    selected_file_path = os.path.join(csv_directory, selected_csv)
+    result = load_csv_to_dataframe(selected_file_path)
+    if isinstance(result, str):
+        # Gestion d'une erreur renvoyée par scrape_url
+        st.sidebar.write(f'<span style="color: red;">{result}</span>', unsafe_allow_html=True)
+    df = result[0]
+    target_type = result[1]
+    # Vérification si un DataFrame a été créé
+    if isinstance(df, pd.DataFrame):
+        expander = st.sidebar.expander("Sélectionnez des colonnes spécifiques")
+        try:
+            columns = expander.multiselect(
+                "Choissisez les colonnes sur lesquelles appliquer le modèle, n'oubliez pas la colonne target",
+                df.columns)
+            if columns:
+                df = df[columns]
+            with st.expander("**DataFrame**"):
+                # Affichage du DataFrame
+                st.write(df)
+            with st.expander("**Description du DataFrame**"):
+                description = df.describe()
+                st.write(description)
+            selected_model, model_family, selected_params, test_size = get_algo(target_type)
+            if test_size is None:
+                data_preprocessor = DataPreprocessor(df, target_column='target')
+            else:
+                data_preprocessor = DataPreprocessor(df, target_column='target', test_size=test_size)
+            processed_dataframe = data_preprocessor.processed_data
+            X_train = data_preprocessor.X_train
+            X_test = data_preprocessor.X_test
+            y_train = data_preprocessor.y_train
+            y_test = data_preprocessor.y_test
+            with st.expander("**Matrice de Corrélation**"):
+                correlation_matrix = processed_dataframe.corr()
+                plt.figure(figsize=(10, 8))
+                sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+                # Ne pas afficher le message warning
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot()
+            with st.expander("**GridSearchCV**"):
+                # Récupération des résultats de GridSearchCV
+                best_model, best_params, best_score = train_model(selected_model, X_train, y_train, selected_params)
+                st.write("**Les hyperparamètres optimaux sont :**")
+                for param_name, param_value in best_params.items():
+                    st.markdown(f"{param_name} : <span style='color: #FFB923'>{param_value}</span>",
                                 unsafe_allow_html=True)
-            except Exception:
-                st.sidebar.error(
-                    f"Il y a une erreur de sélection. Sélectionnez une ou plusieurs colonnes, colonne 'target' en dernière.")
+                st.write("**Le score obtenu est :**")
+                st.write(f'<span style="color: #FFB923;"> {best_score}</span>', unsafe_allow_html=True)
+            with st.expander("**Métriques**"):
+                metrics, y_pred = evaluate_model(best_model, X_test, y_test, model_family)
+                for metric_name, metric_value in metrics.items():
+                    st.markdown(f"<span style='color: #FFB923'>{metric_name}</span> : {metric_value}",
+                                unsafe_allow_html=True)
+                    if metric_name == "Accuracy":
+                        st.markdown(
+                            "_Proportion de prédictions correctes parmi toutes les prédictions effectuées._")
+                    elif metric_name == "Precision":
+                        st.markdown("_Proportion de vrais positifs parmi toutes les prédictions positives._")
+                    elif metric_name == "Recall":
+                        st.markdown("_Proportion de vrais positifs parmi toutes les instances réelles positives._")
+                    elif metric_name == "F1-Score":
+                        st.markdown(
+                            "_Moyenne harmonique de la précision et du rappel, une mesure globale de la performance._")
+                    elif metric_name == "MSE":
+                        st.markdown(
+                            "_Mean Squared Error (Erreur quadratique moyenne), une mesure de la précision des prédictions._")
+                    elif metric_name == "R²":
+                        st.markdown(
+                            "_Coefficient de détermination R², une mesure de l'ajustement du modèle aux données._")
+                    else:
+                        st.markdown(f"{metric_name} : {metric_value}")
+            with st.expander("**Visualisations**"):
+                fig_1, help_text_1, fig_2, help_text_2 = visualize_selected_model(selected_model, y_test, y_pred)
+                st.pyplot(fig_1)
+                st.caption(help_text_1)
+                st.write('')
+                st.pyplot(fig_2)
+                st.caption(help_text_2)
+                # Courbe d'apprentissage
+                st.subheader("Courbe d'Apprentissage")
+                learning_curve_plot = plot_learning_curve(best_model, X_train, y_train)
+                st.pyplot(learning_curve_plot)
+                st.caption(
+                    "La courbe d'apprentissage montre comment la performance d'un modèle change à mesure que vous lui donnez plus de données d'entraînement. Elle indique si le modèle apprend bien ou s'il en sait trop.")
+            # Gestion du pdf
+            generate_report = st.button("Générer le rapport PDF")
+            if generate_report:
+                pdf_data = generate_pdf_report(selected_model, best_params, best_score, metrics, fig_1, fig_2)
+                # Affichez le lien de téléchargement pour le PDF généré
+                st.success("Le rapport PDF a été généré avec succès. Cliquez ci-dessous pour le télécharger.")
+                st.markdown(get_binary_file_downloader_html(pdf_data, "Rapport", "Télécharger le PDF"),
+                            unsafe_allow_html=True)
+        except Exception:
+            st.sidebar.error(
+                f"Il y a une erreur de sélection. Sélectionnez une ou plusieurs colonnes, colonne 'target' en dernière.")
 
 
 def get_algo(target_type):
