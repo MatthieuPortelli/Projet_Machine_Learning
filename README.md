@@ -4,7 +4,7 @@
 
 ## Fonctionnalités
 
-- **Chargement des Données** : Sélectionnez un ensemble de données parmi une liste de tables disponibles sur une base de données PostgreSQL.
+- **Chargement des Données** : Sélectionnez un ensemble de données parmi deux CSV disponibles.
 
 - **Sélection des Colonnes** : Choisissez les colonnes spécifiques du jeu de données à utiliser, y compris la colonne cible.
 
