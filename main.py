@@ -13,7 +13,7 @@ from visualisations import visualize_selected_model, plot_learning_curve
 
 def intro():
     return st.set_page_config(
-        page_title="ML Playground",
+        page_title="Projet Machine Learning",
         layout="centered",
         initial_sidebar_state="auto"
     )
