@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 
@@ -13,3 +14,9 @@ def load_csv_to_dataframe(uploaded_file):
     # Inspecter le type de données de la colonne "target"
     target_type = df["target"].dtype
     return df, target_type
+
+
+# Fonction pour lire les csv déjà présents
+def list_csv_files(csv_directory):
+    csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
+    return csv_files
