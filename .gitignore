@@ -1,0 +1,5 @@
+# Ignorer le répertoire __pycache__ généré par Python
+__pycache__/
+
+# Ignorer le répertoire .idea généré par PyCharm
+.idea/
